@@ -1,4 +1,4 @@
-# SURAKSHA AI — Cross-Platform Disaster Safety Mobile Application
+# SURAKSHA-AI — Cross-Platform Disaster Safety Mobile Application
 
 SURAKSHA AI is a mission-critical, cross-platform mobile application for Android and iOS built for disaster preparedness, authoritative alert comprehension, situation-aware emergency guidance, offline safety rules, emergency SOS preparation, local trusted contact management, and lifeline relief resource navigation.
 
