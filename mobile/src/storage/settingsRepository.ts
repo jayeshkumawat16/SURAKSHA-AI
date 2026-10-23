@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { getDatabase, memoryStore } from "./database";
 import { AIMode } from "../types";
 
@@ -60,8 +61,10 @@ export async function setAIMode(mode: AIMode): Promise<void> {
 }
 
 export async function getApiBaseUrl(): Promise<string> {
-  // Expo public env variable or default localhost / lan
-  const defaultUrl = process.env.EXPO_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+  // Expo public env variable, else same-origin on web (Netlify Functions serve /api), else localhost / lan
+  const defaultUrl =
+    process.env.EXPO_PUBLIC_API_BASE_URL ||
+    (Platform.OS === "web" && typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:8000");
   return await getSetting(SETTING_KEYS.API_BASE_URL, defaultUrl);
 }
 

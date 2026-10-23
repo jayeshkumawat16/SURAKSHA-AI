@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
     "@expo/vector-icons": "^15.0.3",
+    "@google/genai": "^2.31.0",
     "expo": "~58.0.17",
     "expo-constants": "~58.0.13",
     "expo-font": "~58.0.9",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@netlify/functions": "^6.0.3",
     "@types/jest": "30.0.0",
     "@types/react": "~19.3.0",
     "jest": "~30.5.2",
