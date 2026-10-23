@@ -1,4 +1,3 @@
-
 {
   "expo": {
     "name": "SURAKSHA AI",
@@ -42,6 +41,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "web": {
+      "output": "static",
+      "bundler": "metro"
     }
   }
 }
