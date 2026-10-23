@@ -1,0 +1,48 @@
+# Secrets & Environments
+.env
+.env*.local
+backend/.env
+mobile/.env
+*.pem
+*.key
+
+# Python
+backend/venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node & React Native / Expo
+node_modules/
+mobile/node_modules/
+.expo/
+mobile/.expo/
+dist/
+mobile/dist/
+web-build/
+*.tsbuildinfo
+
+# Native build artifacts
+*.orig.*
+android/
+ios/
+*.ipa
+*.apk
+*.aab
+
+# Logs and system
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
