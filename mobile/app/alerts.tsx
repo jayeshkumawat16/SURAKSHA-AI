@@ -19,7 +19,7 @@ import { AlertItem } from "../src/types";
 
 export default function AlertsScreen() {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [isLive, setIsLive] = useState<boolean>(true);
+  const [isLive, setIsLive] = useState<boolean>(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [lastChecked, setLastChecked] = useState<string>("Checking...");
@@ -73,14 +73,14 @@ export default function AlertsScreen() {
             <Text style={styles.noticeTitle}>DISASTER ALERT PROVENANCE</Text>
           </View>
           <Text style={styles.noticeText}>
-            SURAKSHA AI displays alerts parsed directly from authorized feeds (e.g. NDMA SACHET, IMD, NCS).
-            We do NOT invent active alerts or claim universal earthquake lead-time predictions.
-            Sample prototype records are marked <Text style={styles.boldDemo}>DEMO — NOT VERIFIED</Text>.
+            SURAKSHA AI is designed to show alerts from authorized sources (e.g. NDMA SACHET, IMD, NCS),
+            but no live alert feed is connected in this prototype. We do NOT invent active alerts or claim
+            earthquake prediction. Sample records are marked <Text style={styles.boldDemo}>DEMO — NOT VERIFIED</Text>.
           </Text>
           <View style={styles.lastCheckRow}>
             <Text style={styles.lastCheckText}>Last Checked: {lastChecked}</Text>
             <Badge
-              label={isLive ? "LIVE FEED ACTIVE" : "OFFLINE / DEMO CACHE"}
+              label={isLive ? "LIVE FEED ACTIVE" : "NO LIVE FEED — SAMPLE DATA"}
               variant={isLive ? "success" : "offline"}
             />
           </View>
@@ -115,6 +115,13 @@ export default function AlertsScreen() {
         <Text style={styles.sectionHeaderTitle}>
           ACTIVE ADVISORIES ({alerts.length})
         </Text>
+
+        {alerts.length === 0 && (
+          <Text style={styles.noticeText}>
+            No alerts were received. This does not mean there is no danger — check official sources
+            (NDMA SACHET, IMD) and local authorities.
+          </Text>
+        )}
 
         {alerts.map((alert) => {
           const isCritical = alert.severity === "critical";

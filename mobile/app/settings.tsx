@@ -61,8 +61,12 @@ export default function SettingsScreen() {
     const lastSync = await getSetting(SETTING_KEYS.LAST_SYNC, "");
     setLastSyncStr(formatTimeAgo(lastSync));
 
-    const reach = await checkBackendReachability();
-    setBackendStatus(reach.reachable ? "Reachable" : "Offline / Unreachable");
+    if (offline) {
+      setBackendStatus("Not checked (offline mode)");
+    } else {
+      const reach = await checkBackendReachability();
+      setBackendStatus(reach.reachable ? "Reachable" : "Offline / Unreachable");
+    }
   };
 
   const handleToggleManualOffline = async (val: boolean) => {
@@ -208,7 +212,7 @@ export default function SettingsScreen() {
             <Text style={styles.sectionHeading}>LANGUAGE PREFERENCE</Text>
           </View>
           <Text style={styles.langHint}>
-            Selected UI & Emergency Instruction Language:
+            Your choice is saved, but translations are not available yet. Guidance is currently in English:
           </Text>
           <View style={styles.langGrid}>
             {["English", "हिंदी (Hindi)", "বাংলা (Bengali)", "தமிழ் (Tamil)"].map((lang) => {

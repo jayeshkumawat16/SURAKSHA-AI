@@ -174,21 +174,45 @@ OFFLINE_RULES = {
 
 
 def classify_hazard(text: str) -> str:
-    """Classifies disaster hazard category from text using regex keywords."""
+    """Classifies disaster hazard category from text using regex keywords.
+
+    Patterns match common inflections (flooding, flooded, flames, earthquakes, ...). The earlier
+    version wrapped bare stems in \\b...\\b, so "flooding" or "inundated" never matched and fell
+    through to the generic 'unknown' guidance.
+    """
     lower = text.lower()
 
-    if re.search(r"\b(earthquake|quake|tremor|shaking|aftershock|seismic|ground shaking)\b", lower):
+    if re.search(r"\b(?:earthquakes?|quakes?|tremors?|shaking|aftershocks?|seismic|ground shaking)\b", lower):
         return "earthquake"
-    if re.search(r"\b(flood|water level|water rising|drowning|overflow|inundat|submerg|flash flood)\b", lower):
+    if re.search(r"\b(?:flood\w*|water level|waters? (?:is |are )?ris(?:ing|e|es)|drowning|overflow\w*|inundat\w*|submerg\w*)\b", lower):
         return "flood"
-    if re.search(r"\b(fire|smoke|flame|burning|burn|fire alarm|blaze|gas leak|explosion)\b", lower):
+    if re.search(r"\b(?:fires?|smok(?:e|ing|y)|flames?|flaming|burning|burn|fire alarm|blaz(?:e|es|ing)|gas leaks?|explosions?)\b", lower):
         return "fire"
-    if re.search(r"\b(cyclone|hurricane|typhoon|storm|heavy wind|gale|tornado)\b", lower):
+    if re.search(r"\b(?:cyclones?|hurricanes?|typhoons?|storms?|heavy winds?|gales?|tornad(?:o|oes))\b", lower):
         return "cyclone"
-    if re.search(r"\b(cpr|unconscious|bleeding|heart attack|chest pain|choking|stroke|fracture|wound|poison|injury|breathing)\b", lower):
+    if re.search(r"\b(?:cpr|unconscious|bleeding|heart attack|chest pain|choking|stroke|fractures?|wounds?|poison\w*|injur(?:y|ies|ed)|breathing)\b", lower):
         return "medical"
 
     return "unknown"
+
+
+def _normalize_previous_hazard(previous_hazard: Optional[str]) -> Optional[str]:
+    """Maps whatever the client sends back (rule key such as 'flood', or a display label such as
+    'Flooding' / 'Fire & Smoke') to an OFFLINE_RULES key. Returns None if it cannot be mapped."""
+    if not previous_hazard:
+        return None
+    prev = previous_hazard.strip().lower()
+    if prev in OFFLINE_RULES:
+        return prev
+    for key, rule in OFFLINE_RULES.items():
+        if rule["hazard"].lower() == prev:
+            return key
+    classified = classify_hazard(previous_hazard)
+    if classified != "unknown":
+        return classified
+    if "medical" in prev:
+        return "medical"
+    return None
 
 
 def evaluate_offline_safety_plan(
@@ -201,8 +225,9 @@ def evaluate_offline_safety_plan(
     Works 100% offline without any network or external API dependency.
     """
     detected_hazard = classify_hazard(report)
-    if detected_hazard == "unknown" and previous_hazard and previous_hazard in OFFLINE_RULES:
-        detected_hazard = previous_hazard
+    previous_key = _normalize_previous_hazard(previous_hazard)
+    if detected_hazard == "unknown" and previous_key:
+        detected_hazard = previous_key
 
     rule = OFFLINE_RULES.get(detected_hazard, OFFLINE_RULES["unknown"])
 

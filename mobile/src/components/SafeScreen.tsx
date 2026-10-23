@@ -12,7 +12,7 @@ interface SafeScreenProps {
 export const SafeScreen: React.FC<SafeScreenProps> = ({ children, style }) => {
   return (
     <SafeAreaView style={[styles.container, style]}>
-      <StatusBar style="light" backgroundColor={COLORS.background} />
+      <StatusBar style="light" />
       {children}
     </SafeAreaView>
   );

@@ -100,18 +100,17 @@ export function promptAndCallEmergencyServices(serviceNumber: string = "112") {
         text: `Open Dialler (${serviceNumber})`,
         style: "destructive",
         onPress: () => {
-          const telUrl = `tel:${serviceNumber}`;
-          Linking.canOpenURL(telUrl)
-            .then((supported) => {
-              if (supported) {
-                Linking.openURL(telUrl);
-              } else {
-                Alert.alert("Dialler Unavailable", `Cannot open dialler for ${serviceNumber} on this device.`);
-              }
-            })
-            .catch(() => {
-              Alert.alert("Error", `Could not initiate phone call to ${serviceNumber}.`);
-            });
+          // Strip spaces/dashes/brackets: "tel:+91 98765 43210" is not a valid dial URI on every OS.
+          const dialable = serviceNumber.replace(/[^\d+*#]/g, "");
+          const telUrl = `tel:${dialable}`;
+          // No canOpenURL() pre-check: on iOS it can return false for "tel" unless the scheme is declared
+          // in LSApplicationQueriesSchemes, which would wrongly block an emergency call.
+          Linking.openURL(telUrl).catch(() => {
+            Alert.alert(
+              "Dialler Unavailable",
+              `Could not open the phone dialler for ${serviceNumber}. Please dial it manually.`
+            );
+          });
         }
       }
     ]

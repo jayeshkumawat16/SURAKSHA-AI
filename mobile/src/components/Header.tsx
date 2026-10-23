@@ -9,7 +9,7 @@ interface HeaderProps {
   title?: string;
   subtitle?: string;
   showBack?: boolean;
-  isOnline?: boolean;
+  isOnline?: boolean; // badge is shown only when the screen passes a real connectivity state
   rightAction?: {
     icon: keyof typeof Ionicons.glyphMap;
     onPress: () => void;
@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   title = "SURAKSHA AI",
   subtitle,
   showBack = false,
-  isOnline = true,
+  isOnline,
   rightAction
 }) => {
   const router = useRouter();
@@ -47,10 +47,12 @@ export const Header: React.FC<HeaderProps> = ({
         </View>
 
         <View style={styles.rightGroup}>
-          <Badge
-            label={isOnline ? "ONLINE" : "OFFLINE"}
-            variant={isOnline ? "success" : "offline"}
-          />
+          {isOnline !== undefined && (
+            <Badge
+              label={isOnline ? "ONLINE" : "OFFLINE"}
+              variant={isOnline ? "success" : "offline"}
+            />
+          )}
           {rightAction && (
             <TouchableOpacity
               onPress={rightAction.onPress}

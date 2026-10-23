@@ -83,7 +83,7 @@ export default function GuidesScreen() {
 
             {/* Post incident */}
             <View style={styles.guideSection}>
-              <Text style={styles.sectionHeading}>AFTER SHAKING / DISASTER STABILIZATION:</Text>
+              <Text style={styles.sectionHeading}>NEXT STEPS:</Text>
               {selectedGuide.postIncidentSteps.map((item, idx) => (
                 <View key={idx} style={styles.bulletRow}>
                   <Ionicons name="arrow-forward-circle" size={16} color={COLORS.textSecondary} style={styles.iconBullet} />

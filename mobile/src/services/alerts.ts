@@ -50,15 +50,21 @@ export async function fetchAlerts(): Promise<{
 
   try {
     const data = await getJson<AlertItem[]>("/api/alerts", 5000);
+    // The backend being reachable does NOT mean a live alert feed exists: it currently serves only
+    // DEMO_NOT_VERIFIED records. Report "live" only if at least one alert is from an authoritative source.
+    const hasAuthoritative = data.some((a) => a.provenance === "AUTHORITATIVE_SOURCE");
     return {
       alerts: data,
-      isLive: true
+      isLive: hasAuthoritative,
+      error: hasAuthoritative
+        ? undefined
+        : "No live alert feed is connected. These are sample records only. Check NDMA SACHET / IMD for real warnings."
     };
   } catch (error: any) {
     return {
       alerts: LOCAL_FALLBACK_ALERTS,
       isLive: false,
-      error: "Live alert feed unreachable. Showing verified offline demonstration records."
+      error: "Live alert feed unreachable. Showing offline sample records only (not real warnings)."
     };
   }
 }

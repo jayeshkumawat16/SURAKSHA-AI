@@ -31,6 +31,11 @@ const CATEGORIES: { label: string; value: ResourceCategory | "all"; icon: keyof 
   { label: "Emergency", value: "emergency_service", icon: "flame-outline" },
 ];
 
+const provenanceBadge = (p: LifelineResource["provenance"]) =>
+  p === "OFFICIAL_DIRECTORY"
+    ? { label: "OFFICIAL DIRECTORY", variant: "success" as const }
+    : { label: "DEMO — NOT VERIFIED", variant: "demo" as const };
+
 export default function LifelineMapScreen() {
   const [selectedCategory, setSelectedCategory] = useState<ResourceCategory | "all">("all");
   const [resources, setResources] = useState<LifelineResource[]>([]);
@@ -142,10 +147,18 @@ export default function LifelineMapScreen() {
             </View>
 
             <View style={styles.badgeRow}>
-              <Badge label="DEMO — NOT VERIFIED" variant="demo" />
+              <Badge {...provenanceBadge(selectedItem.provenance)} />
               <Badge
-                label={`STATUS: ${selectedItem.operating_status.toUpperCase()}`}
-                variant={selectedItem.operating_status === "open" ? "success" : "moderate"}
+                label={
+                  selectedItem.provenance === "OFFICIAL_DIRECTORY"
+                    ? `STATUS: ${selectedItem.operating_status.toUpperCase()}`
+                    : "STATUS: UNVERIFIED"
+                }
+                variant={
+                  selectedItem.provenance === "OFFICIAL_DIRECTORY" && selectedItem.operating_status === "open"
+                    ? "success"
+                    : "moderate"
+                }
               />
             </View>
 
@@ -158,7 +171,9 @@ export default function LifelineMapScreen() {
             <View style={styles.detailMetaRow}>
               <Text style={styles.detailMetaText}>Source: {selectedItem.source}</Text>
               <Text style={styles.detailMetaText}>
-                Verified: {new Date(selectedItem.last_verified).toLocaleDateString()}
+                {selectedItem.provenance === "OFFICIAL_DIRECTORY"
+                  ? `Verified: ${new Date(selectedItem.last_verified).toLocaleDateString()}`
+                  : "Not verified (demo data)"}
               </Text>
             </View>
 
@@ -210,7 +225,7 @@ export default function LifelineMapScreen() {
                     {item.address}
                   </Text>
                 </View>
-                <Badge label="DEMO — NOT VERIFIED" variant="demo" />
+                <Badge {...provenanceBadge(item.provenance)} />
               </View>
 
               <View style={styles.cardBottomRow}>

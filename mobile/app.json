@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "SURAKSHA AI",
@@ -7,12 +8,6 @@
     "icon": "./assets/icon.png",
     "scheme": "suraksha",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0A1128"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.suraksha.ai",
@@ -33,7 +28,17 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0A1128"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

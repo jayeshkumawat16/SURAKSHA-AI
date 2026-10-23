@@ -34,13 +34,20 @@ export default function AssistantScreen() {
   const [previousHazard, setPreviousHazard] = useState<string | undefined>(params.hazard);
 
   useEffect(() => {
-    getAIMode().then(setAiModeState);
-    if (params.report) {
-      handleAnalyze(params.report);
-    }
+    // Load the saved engine choice first so an auto-submitted report honours "Offline Only".
+    getAIMode().then((savedMode) => {
+      setAiModeState(savedMode);
+      if (params.report) {
+        handleAnalyze(params.report, false, savedMode);
+      }
+    });
   }, [params.report]);
 
-  const handleAnalyze = async (reportText?: string, isUpdate: boolean = false) => {
+  const handleAnalyze = async (
+    reportText?: string,
+    isUpdate: boolean = false,
+    modeOverride?: AIMode
+  ) => {
     const textToSubmit = reportText || inputReport;
     if (!textToSubmit.trim()) {
       Alert.alert("Input Needed", "Please type what is happening in your area.");
@@ -54,7 +61,7 @@ export default function AssistantScreen() {
       report: textToSubmit,
       previous_hazard: previousHazard,
       is_situation_update: isUpdate,
-      force_mode: aiMode,
+      force_mode: modeOverride ?? aiMode,
     });
 
     setLoading(false);
@@ -68,7 +75,9 @@ export default function AssistantScreen() {
   };
 
   const handleSituationUpdate = (updateScenario: string) => {
-    const updatedText = `${inputReport ? inputReport + ". " : ""}UPDATE: ${updateScenario}`;
+    if (loading) return;
+    // Backend rejects reports over 1000 chars (HTTP 422); keep the most recent 1000.
+    const updatedText = `${inputReport ? inputReport + ". " : ""}UPDATE: ${updateScenario}`.slice(-1000);
     setInputReport(updatedText);
     handleAnalyze(updatedText, true);
   };
@@ -77,7 +86,8 @@ export default function AssistantScreen() {
     await setAIMode("offline");
     setAiModeState("offline");
     setErrorMsg(null);
-    handleAnalyze(inputReport);
+    // Pass the mode explicitly: aiMode state has not updated yet inside this closure.
+    handleAnalyze(inputReport, false, "offline");
   };
 
   return (

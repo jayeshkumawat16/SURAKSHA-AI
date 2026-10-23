@@ -29,7 +29,7 @@ export default function RootLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="shield-checkmark" size={size} color={color} />
+            <Ionicons name="shield-checkmark" size={size} color={typeof color === "string" ? color : COLORS.textMuted} />
           ),
         }}
       />
@@ -38,7 +38,7 @@ export default function RootLayout() {
         options={{
           title: "Alerts",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="warning" size={size} color={color} />
+            <Ionicons name="warning" size={size} color={typeof color === "string" ? color : COLORS.textMuted} />
           ),
         }}
       />
@@ -47,7 +47,7 @@ export default function RootLayout() {
         options={{
           title: "Map & Relief",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="map" size={size} color={color} />
+            <Ionicons name="map" size={size} color={typeof color === "string" ? color : COLORS.textMuted} />
           ),
         }}
       />
@@ -56,7 +56,7 @@ export default function RootLayout() {
         options={{
           title: "Assistant",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbubbles" size={size} color={color} />
+            <Ionicons name="chatbubbles" size={size} color={typeof color === "string" ? color : COLORS.textMuted} />
           ),
         }}
       />

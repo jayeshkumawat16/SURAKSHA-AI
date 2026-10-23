@@ -155,23 +155,42 @@ export const ALL_EMERGENCY_GUIDES: EmergencyGuide[] = [
 ];
 
 export function classifyOfflineHazard(text: string): HazardType {
+  // Patterns match common inflections (flooding, flooded, flames, earthquakes, ...).
+  // Bare stems wrapped in \b...\b previously never matched "flooding" or "inundated".
   const lower = text.toLowerCase();
-  if (/\b(earthquake|quake|tremor|shaking|aftershock|seismic)\b/.test(lower)) {
+  if (/\b(?:earthquakes?|quakes?|tremors?|shaking|aftershocks?|seismic|ground shaking)\b/.test(lower)) {
     return "earthquake";
   }
-  if (/\b(flood|water level|water rising|drowning|inundat|submerg|flash flood)\b/.test(lower)) {
+  if (/\b(?:flood\w*|water level|waters? (?:is |are )?ris(?:ing|e|es)|drowning|overflow\w*|inundat\w*|submerg\w*)\b/.test(lower)) {
     return "flood";
   }
-  if (/\b(fire|smoke|flame|burning|burn|fire alarm|blaze|gas leak)\b/.test(lower)) {
+  if (/\b(?:fires?|smok(?:e|ing|y)|flames?|flaming|burning|burn|fire alarm|blaz(?:e|es|ing)|gas leaks?|explosions?)\b/.test(lower)) {
     return "fire";
   }
-  if (/\b(cyclone|hurricane|typhoon|storm|heavy wind|gale)\b/.test(lower)) {
+  if (/\b(?:cyclones?|hurricanes?|typhoons?|storms?|heavy winds?|gales?|tornad(?:o|oes))\b/.test(lower)) {
     return "cyclone";
   }
-  if (/\b(cpr|unconscious|bleeding|heart attack|chest pain|choking|stroke|fracture|injury|breathing)\b/.test(lower)) {
+  if (/\b(?:cpr|unconscious|bleeding|heart attack|chest pain|choking|stroke|fractures?|wounds?|poison\w*|injur(?:y|ies|ed)|breathing)\b/.test(lower)) {
     return "medical";
   }
   return "unknown";
+}
+
+/**
+ * The assistant screen sends back the hazard label it last displayed (e.g. "Flood & Flash Inundation"
+ * or the backend's "Flooding"), not an internal key. Map either form to a HazardType.
+ */
+function normalizePreviousHazard(previousHazard?: string): HazardType | undefined {
+  if (!previousHazard) return undefined;
+  const prev = previousHazard.trim().toLowerCase();
+  const valid: HazardType[] = ["earthquake", "flood", "fire", "cyclone", "medical"];
+  if ((valid as string[]).includes(prev)) return prev as HazardType;
+  const byTitle = ALL_EMERGENCY_GUIDES.find((g) => g.title.toLowerCase() === prev);
+  if (byTitle && byTitle.hazard !== "unknown") return byTitle.hazard;
+  const classified = classifyOfflineHazard(previousHazard);
+  if (classified !== "unknown") return classified;
+  if (prev.includes("medical")) return "medical";
+  return undefined;
 }
 
 export function getOfflineSafetyGuidance(
@@ -180,10 +199,10 @@ export function getOfflineSafetyGuidance(
   isSituationUpdate?: boolean
 ): AssistantResponse {
   let detected = classifyOfflineHazard(report);
-  if (detected === "unknown" && previousHazard) {
-    const validHazards: HazardType[] = ["earthquake", "flood", "fire", "cyclone", "medical"];
-    if (validHazards.includes(previousHazard as HazardType)) {
-      detected = previousHazard as HazardType;
+  if (detected === "unknown") {
+    const previous = normalizePreviousHazard(previousHazard);
+    if (previous) {
+      detected = previous;
     }
   }
 

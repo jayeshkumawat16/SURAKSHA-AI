@@ -31,13 +31,12 @@ import {
   deleteContact
 } from "../src/storage/contactsRepository";
 import {
-  saveLastSOSMessage,
-  getLastSOSMessage
+  saveLastSOSMessage
 } from "../src/storage/guidesRepository";
 import { EmergencyLocation, TrustedContact } from "../src/types";
 
 export default function SOSScreen() {
-  const [situationText, setSituationText] = useState<string>("Trapped / in danger. Need emergency assistance.");
+  const [situationText, setSituationText] = useState<string>("I need emergency help.");
   const [manualLocation, setManualLocation] = useState<string>("");
   const [location, setLocation] = useState<EmergencyLocation | null>(null);
   const [locCapturing, setLocCapturing] = useState<boolean>(false);
@@ -59,13 +58,9 @@ export default function SOSScreen() {
 
   useEffect(() => {
     refreshContacts();
-    getLastSOSMessage().then((saved) => {
-      if (saved) {
-        setComposedMessage(saved);
-      } else {
-        updateMessagePreview(situationText, null, manualLocation);
-      }
-    });
+    // Always compose a fresh message (current time, no previously captured GPS). Restoring the last
+    // saved draft would let an old time/location be shared as if it were current.
+    updateMessagePreview(situationText, null, manualLocation);
   }, [refreshContacts]);
 
   const updateMessagePreview = (

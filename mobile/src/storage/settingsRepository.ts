@@ -76,6 +76,8 @@ export async function clearAllPersonalData(): Promise<void> {
       await db.runAsync("DELETE FROM app_settings;");
       await db.runAsync("DELETE FROM trusted_contacts;");
       await db.runAsync("DELETE FROM cached_sos;");
+      await db.runAsync("DELETE FROM checklist_items;");
+      memoryStore.checklist_items = {};
       return;
     } catch (e) {
       console.warn("DB clear error in clearAllPersonalData:", e);
@@ -85,4 +87,5 @@ export async function clearAllPersonalData(): Promise<void> {
   memoryStore.app_settings = {};
   memoryStore.trusted_contacts = {};
   memoryStore.cached_sos = {};
+  memoryStore.checklist_items = {};
 }
